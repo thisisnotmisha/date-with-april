@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Date With April</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #ffe0f0 0%, #fff4e0 50%, #e0f4ff 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Floating hearts background */
+  .hearts-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .heart-float {
+    position: absolute;
+    bottom: -50px;
+    font-size: 1.5rem;
+    animation: floatUp linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+    100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+  }
+
+  /* Main card */
+  .card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(10px);
+    border-radius: 32px;
+    padding: 36px 40px 32px;
+    max-width: 520px;
+    width: 92%;
+    box-shadow: 0 8px 40px rgba(200,100,150,0.18);
+    text-align: center;
+    border: 2.5px solid rgba(255,180,210,0.5);
+  }
+
+  h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2rem;
+    color: #d63a7a;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: #b05070;
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+
+  /* Pony SVG container */
+  .pony-wrap {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 10px;
+    position: relative;
+  }
+
+  /* Speech bubble */
+  .speech-bubble {
+    background: #fff0f6;
+    border: 2.5px solid #f4a0c0;
+    border-radius: 20px;
+    padding: 14px 18px;
+    font-size: 1rem;
+    color: #8a2040;
+    font-weight: 700;
+    position: relative;
+    margin-bottom: 6px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: #f4a0c0 transparent transparent;
+  }
+  .speech-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 9px 9px 0;
+    border-style: solid;
+    border-color: #fff0f6 transparent transparent;
+    z-index: 1;
+  }
+
+  /* Editable letter inside bubble */
+  .letter-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: #8a2040;
+    font-weight: 700;
+    width: 100%;
+    line-height: 1.5;
+    padding: 0;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #ff6eb4, #e0407a);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 40px;
+    font-size: 1.2rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(220,60,100,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 1px;
+  }
+  .btn-yes:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 24px rgba(220,60,100,0.45);
+  }
+
+  .btn-no {
+    background: #f0e0e8;
+    color: #b05070;
+    border: 2px solid #e0a0c0;
+    border-radius: 50px;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s;
+    position: relative;
+  }
+
+  /* Yes screen */
+  .yes-screen {
+    display: none;
+    animation: popIn 0.5s cubic-bezier(.36,1.5,.6,1) both;
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1);   opacity: 1; }
+  }
+
+  .yes-title {
+    font-family: 'Pacifico', cursive;
+    font-size: 2rem;
+    color: #d63a7a;
+    margin-bottom: 8px;
+  }
+  .yes-sub {
+    font-size: 1rem;
+    color: #b05070;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    top: -20px;
+    animation: confettiFall linear forwards;
+    z-index: 999;
+    pointer-events: none;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Sad overlay text */
+  .sad-msg {
+    display: none;
+    font-size: 0.9rem;
+    color: #b05070;
+    margin-top: 6px;
+    font-weight: 600;
+    font-style: italic;
+    animation: fadeIn 0.4s;
+  }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .card { padding: 24px 16px 24px; }
+    h1 { font-size: 1.5rem; }
+    .btn-yes { padding: 12px 28px; font-size: 1rem; }
+    .btn-no  { padding: 12px 22px; font-size: 0.95rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating hearts bg -->
+<div class="hearts-bg" id="heartsBg"></div>
+
+<!-- MAIN QUESTION SCREEN -->
+<div class="card" id="mainScreen">
+  <h1>Hello bb the love of my life</h1>
+  <p class="subtitle">Misha has a very important question...</p>
+
+  <!-- Speech bubble above pony -->
+  <div class="speech-bubble">
+    <div class="letter-text">Will you go on a date with me?</div>
+  </div>
+
+  <!-- Pony SVG -->
+  <div class="pony-wrap">
+    <svg id="ponySvg" width="100%" viewBox="0 0 340 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- Sky strip -->
+      <rect fill="#c8edff" x="0" y="0" width="340" height="160"/>
+      <!-- Grass -->
+      <ellipse fill="#7ecb5a" cx="170" cy="210" rx="180" ry="80"/>
+      <rect fill="#7ecb5a" x="0" y="190" width="340" height="90"/>
+      <!-- Sun -->
+      <circle fill="#ffe066" cx="44" cy="38" r="22"/>
+      <line stroke="#ffcc00" stroke-width="2.5" stroke-linecap="round" x1="44" y1="10" x2="44" y2="3"/>
+      <line stroke="#ffcc00" stroke-width="2.5" stroke-linecap="round" x1="44" y1="66" x2="44" y2="73"/>
+      <line stroke="#ffcc00" stroke-width="2.5" stroke-linecap="round" x1="16" y1="38" x2="9" y2="38"/>
+      <line stroke="#ffcc00" stroke-width="2.5" stroke-linecap="round" x1="72" y1="38" x2="79" y2="38"/>
+      <line stroke="#ffcc00" stroke-width="2.5" stroke-linecap="round" x1="24" y1="18" x2="19" y2="13"/>
+      <line stroke="#ffcc00" stroke-width="2.5" stroke-linecap="round" x1="64" y1="58" x2="69" y2="63"/>
+      <!-- Tail -->
+      <path fill="#991010" d="M233 138 Q255 112 265 148 Q258 172 240 162 Q252 142 233 138Z"/>
+      <path fill="#cc1111" d="M230 142 Q250 118 258 154 Q252 176 237 166 Q248 148 230 142Z"/>
+      <path fill="#e03030" d="M227 148 Q244 128 250 160 Q245 178 233 170 Q243 153 227 148Z"/>
+      <!-- Body -->
+      <ellipse fill="#8B5E3C" stroke="#6b4020" stroke-width="2" cx="170" cy="162" rx="72" ry="50"/>
+      <!-- Legs -->
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="110" y="188" width="18" height="38" rx="7"/>
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="138" y="190" width="18" height="37" rx="7"/>
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="184" y="190" width="18" height="37" rx="7"/>
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="212" y="188" width="18" height="38" rx="7"/>
+      <!-- Hooves -->
+      <rect fill="#6b4020" stroke="#4a2c10" stroke-width="1.5" x="110" y="218" width="18" height="11" rx="5"/>
+      <rect fill="#6b4020" stroke="#4a2c10" stroke-width="1.5" x="138" y="219" width="18" height="11" rx="5"/>
+      <rect fill="#6b4020" stroke="#4a2c10" stroke-width="1.5" x="184" y="219" width="18" height="11" rx="5"/>
+      <rect fill="#6b4020" stroke="#4a2c10" stroke-width="1.5" x="212" y="218" width="18" height="11" rx="5"/>
+      <!-- Neck -->
+      <path fill="#8B5E3C" stroke="#6b4020" stroke-width="2" d="M113 128 Q118 96 130 90 Q142 87 144 115 Q136 126 128 138 Z"/>
+      <!-- Head -->
+      <ellipse fill="#8B5E3C" stroke="#6b4020" stroke-width="2" cx="136" cy="90" rx="34" ry="30"/>
+      <!-- Ears -->
+      <path fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" d="M116 70 Q112 52 126 57 Q128 68 122 75Z"/>
+      <path fill="#b07040" d="M118 69 Q115 56 124 59 Q125 67 121 73Z"/>
+      <path fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" d="M150 65 Q156 48 164 57 Q161 68 154 73Z"/>
+      <path fill="#b07040" d="M152 65 Q156 52 161 58 Q159 67 154 71Z"/>
+      <!-- Mane -->
+      <path fill="#991010" d="M118 76 Q103 66 101 80 Q98 95 109 100 Q101 108 104 120 Q110 130 120 127 Q112 118 114 108 Q106 101 109 87 Q112 77 121 81Z"/>
+      <path fill="#cc1111" d="M121 73 Q108 62 106 77 Q103 91 113 96 Q104 106 107 118 Q113 128 123 125 Q114 116 116 107 Q108 100 111 86 Q114 75 124 79Z"/>
+      <path fill="#e03030" d="M126 72 Q115 60 113 75 Q111 89 120 93 Q111 104 114 116 Q120 126 129 123 Q120 114 122 105 Q114 98 117 84 Q120 73 129 77Z"/>
+      <!-- Mane top poof -->
+      <ellipse fill="#cc1111" cx="134" cy="62" rx="14" ry="10"/>
+      <ellipse fill="#991010" cx="142" cy="58" rx="11" ry="8"/>
+      <ellipse fill="#e03030" cx="128" cy="59" rx="10" ry="8"/>
+      <path fill="#ff4444" d="M128 55 Q136 45 142 52 Q137 57 138 64 Q133 58 128 55Z"/>
+      <!-- NORMAL EYES (happy/default) - crossed! -->
+      <g id="eyeNormal">
+        <!-- Left eye -->
+        <ellipse fill="#fff" stroke="#333" stroke-width="1" cx="124" cy="86" rx="9" ry="8"/>
+        <ellipse fill="#2a1a0a" cx="128" cy="87" rx="4.5" ry="4.5"/>
+        <ellipse fill="#fff" cx="129" cy="85" rx="1.5" ry="1.5"/>
+        <!-- Right eye -->
+        <ellipse fill="#fff" stroke="#333" stroke-width="1" cx="148" cy="85" rx="9" ry="8"/>
+        <ellipse fill="#2a1a0a" cx="144" cy="86" rx="4.5" ry="4.5"/>
+        <ellipse fill="#fff" cx="143" cy="84" rx="1.5" ry="1.5"/>
+        <!-- Eyebrows normal -->
+        <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M117 79 Q123 75 130 77"/>
+        <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M141 77 Q147 73 155 76"/>
+      </g>
+      <!-- SAD EYES - hidden by default -->
+      <g id="eyeSad" style="display:none;">
+        <!-- droopy eyelids -->
+        <ellipse fill="#fff" stroke="#333" stroke-width="1" cx="124" cy="88" rx="9" ry="7"/>
+        <ellipse fill="#2a1a0a" cx="128" cy="89" rx="4" ry="4"/>
+        <ellipse fill="#fff" cx="129" cy="87" rx="1.5" ry="1.5"/>
+        <path fill="#8B5E3C" d="M115 86 Q124 80 133 86 Q124 84 115 86Z"/>
+        <ellipse fill="#fff" stroke="#333" stroke-width="1" cx="148" cy="87" rx="9" ry="7"/>
+        <ellipse fill="#2a1a0a" cx="144" cy="88" rx="4" ry="4"/>
+        <ellipse fill="#fff" cx="143" cy="86" rx="1.5" ry="1.5"/>
+        <path fill="#8B5E3C" d="M139 85 Q148 79 157 85 Q148 83 139 85Z"/>
+        <!-- sad eyebrows angled -->
+        <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M117 78 Q122 82 130 79"/>
+        <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M141 79 Q147 82 155 78"/>
+        <!-- Tear drops -->
+        <ellipse fill="#88ccff" cx="120" cy="97" rx="2.5" ry="3.5"/>
+        <ellipse fill="#88ccff" cx="152" cy="96" rx="2.5" ry="3.5"/>
+      </g>
+      <!-- HAPPY EYES - hidden by default -->
+      <g id="eyeHappy" style="display:none;">
+        <!-- happy squint arcs -->
+        <path fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" d="M115 87 Q124 79 133 87"/>
+        <path fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" d="M139 86 Q148 78 157 86"/>
+        <!-- rosy blush -->
+        <ellipse fill="#ff99bb" opacity="0.55" cx="114" cy="96" rx="9" ry="6"/>
+        <ellipse fill="#ff99bb" opacity="0.55" cx="158" cy="95" rx="9" ry="6"/>
+        <!-- happy eyebrows -->
+        <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M116 76 Q123 72 131 75"/>
+        <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M140 74 Q147 70 155 74"/>
+      </g>
+      <!-- Snout -->
+      <ellipse fill="#7a4e2a" stroke="#5a3010" stroke-width="1.5" cx="137" cy="108" rx="14" ry="9"/>
+      <ellipse fill="#4a2c10" cx="131" cy="110" rx="2.5" ry="2"/>
+      <ellipse fill="#4a2c10" cx="143" cy="110" rx="2.5" ry="2"/>
+      <!-- Nose ring -->
+      <ellipse fill="none" stroke="#c0c0c0" stroke-width="2" cx="137" cy="114" rx="4.5" ry="3.5"/>
+      <circle fill="#d0d0d0" cx="137" cy="117" r="1.8"/>
+      <!-- Normal smile -->
+      <path id="smileNormal" fill="none" stroke="#5a3010" stroke-width="1.8" stroke-linecap="round" d="M129 118 Q137 124 145 118"/>
+      <!-- Sad frown -->
+      <path id="smileSad" fill="none" stroke="#5a3010" stroke-width="1.8" stroke-linecap="round" d="M129 122 Q137 116 145 122" style="display:none;"/>
+      <!-- Happy big smile -->
+      <path id="smileHappy" fill="none" stroke="#5a3010" stroke-width="2.2" stroke-linecap="round" d="M126 118 Q137 128 148 118" style="display:none;"/>
+      <!-- Cutie mark lightning bolt -->
+      <polygon fill="#ffe066" stroke="#cc9900" stroke-width="1" points="178,148 170,162 178,162 168,180 188,163 178,163 188,148"/>
+      <!-- Blush normal -->
+      <ellipse id="blushNormal" fill="#cc7744" opacity="0.3" cx="118" cy="100" rx="9" ry="5"/>
+      <ellipse id="blushNormal2" fill="#cc7744" opacity="0.3" cx="156" cy="99" rx="9" ry="5"/>
+    </svg>
+  </div>
+
+  <!-- Sad message slot -->
+  <p class="sad-msg" id="sadMsg"></p>
+
+  <!-- Buttons -->
+  <div class="btn-row">
+    <button class="btn-yes" id="btnYes" onclick="pressYes()">YES!</button>
+    <button class="btn-no"  id="btnNo"  onclick="pressNo()">No...</button>
+  </div>
+</div>
+
+<!-- YES SCREEN -->
+<div class="card yes-screen" id="yesScreen">
+  <div class="yes-title">YAAAY!!</div>
+  <p class="yes-sub">Misha is so happy you said yes</p>
+  <div class="pony-wrap">
+    <svg width="100%" viewBox="0 0 340 280" xmlns="http://www.w3.org/2000/svg">
+      <rect fill="#c8edff" x="0" y="0" width="340" height="160"/>
+      <ellipse fill="#7ecb5a" cx="170" cy="210" rx="180" ry="80"/>
+      <rect fill="#7ecb5a" x="0" y="190" width="340" height="90"/>
+      <circle fill="#ffe066" cx="44" cy="38" r="22"/>
+      <path fill="#991010" d="M233 138 Q255 112 265 148 Q258 172 240 162 Q252 142 233 138Z"/>
+      <path fill="#cc1111" d="M230 142 Q250 118 258 154 Q252 176 237 166 Q248 148 230 142Z"/>
+      <ellipse fill="#8B5E3C" stroke="#6b4020" stroke-width="2" cx="170" cy="162" rx="72" ry="50"/>
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="110" y="188" width="18" height="38" rx="7"/>
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="138" y="190" width="18" height="37" rx="7"/>
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="184" y="190" width="18" height="37" rx="7"/>
+      <rect fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" x="212" y="188" width="18" height="38" rx="7"/>
+      <rect fill="#6b4020" x="110" y="218" width="18" height="11" rx="5"/>
+      <rect fill="#6b4020" x="138" y="219" width="18" height="11" rx="5"/>
+      <rect fill="#6b4020" x="184" y="219" width="18" height="11" rx="5"/>
+      <rect fill="#6b4020" x="212" y="218" width="18" height="11" rx="5"/>
+      <path fill="#8B5E3C" stroke="#6b4020" stroke-width="2" d="M113 128 Q118 96 130 90 Q142 87 144 115 Q136 126 128 138 Z"/>
+      <ellipse fill="#8B5E3C" stroke="#6b4020" stroke-width="2" cx="136" cy="90" rx="34" ry="30"/>
+      <path fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" d="M116 70 Q112 52 126 57 Q128 68 122 75Z"/>
+      <path fill="#b07040" d="M118 69 Q115 56 124 59 Q125 67 121 73Z"/>
+      <path fill="#8B5E3C" stroke="#6b4020" stroke-width="1.5" d="M150 65 Q156 48 164 57 Q161 68 154 73Z"/>
+      <path fill="#b07040" d="M152 65 Q156 52 161 58 Q159 67 154 71Z"/>
+      <path fill="#cc1111" d="M121 73 Q108 62 106 77 Q103 91 113 96 Q104 106 107 118 Q113 128 123 125 Q114 116 116 107 Q108 100 111 86 Q114 75 124 79Z"/>
+      <path fill="#e03030" d="M126 72 Q115 60 113 75 Q111 89 120 93 Q111 104 114 116 Q120 126 129 123 Q120 114 122 105 Q114 98 117 84 Q120 73 129 77Z"/>
+      <ellipse fill="#cc1111" cx="134" cy="62" rx="14" ry="10"/>
+      <ellipse fill="#991010" cx="142" cy="58" rx="11" ry="8"/>
+      <ellipse fill="#ff4444" cx="128" cy="59" rx="10" ry="8"/>
+      <!-- Happy squint eyes -->
+      <path fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" d="M115 87 Q124 79 133 87"/>
+      <path fill="none" stroke="#333" stroke-width="2.5" stroke-linecap="round" d="M139 86 Q148 78 157 86"/>
+      <ellipse fill="#ff99bb" opacity="0.6" cx="114" cy="96" rx="10" ry="6"/>
+      <ellipse fill="#ff99bb" opacity="0.6" cx="158" cy="95" rx="10" ry="6"/>
+      <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M116 76 Q123 72 131 75"/>
+      <path fill="none" stroke="#cc1111" stroke-width="2" stroke-linecap="round" d="M140 74 Q147 70 155 74"/>
+      <ellipse fill="#7a4e2a" stroke="#5a3010" stroke-width="1.5" cx="137" cy="108" rx="14" ry="9"/>
+      <ellipse fill="#4a2c10" cx="131" cy="110" rx="2.5" ry="2"/>
+      <ellipse fill="#4a2c10" cx="143" cy="110" rx="2.5" ry="2"/>
+      <ellipse fill="none" stroke="#c0c0c0" stroke-width="2" cx="137" cy="114" rx="4.5" ry="3.5"/>
+      <circle fill="#d0d0d0" cx="137" cy="117" r="1.8"/>
+      <path fill="none" stroke="#5a3010" stroke-width="2.2" stroke-linecap="round" d="M126 118 Q137 128 148 118"/>
+      <polygon fill="#ffe066" stroke="#cc9900" stroke-width="1" points="178,148 170,162 178,162 168,180 188,163 178,163 188,148"/>
+    </svg>
+  </div>
+  <div class="speech-bubble" style="margin-top:10px;">
+    <div class="letter-text">date sabado haha pa lake sebu ta pls upod sa amoa i wanna go somewhere with u (would be better unta if its just us) happy 6th month my baby i love you so much</div>
+  </div>
+</div>
+
+<script>
+  let noCount = 0;
+  const sadMsgs = [
+    "please... ",
+    "Duke is getting really sad now...",
+    ""
+  ];
+  const noPositions = [
+    { top: null, left: null, right: '8px', bottom: '20px' },
+    { top: '10px', left: '10px', right: null, bottom: null },
+    { top: null, left: '10px', right: null, bottom: '20px' },
+  ];
+
+  // Spawn floating hearts background (removed emojis, just empty)
+  const heartsBg = document.getElementById('heartsBg');
+  // No floating elements now
+
+  function pressNo() {
+    noCount++;
+    const btn = document.getElementById('btnNo');
+    const sadMsg = document.getElementById('sadMsg');
+
+    // Run away from mouse on first 2 presses
+    if (noCount < 3) {
+      const card = document.querySelector('.card');
+      const cardRect = card.getBoundingClientRect();
+      const pos = noPositions[noCount % noPositions.length];
+      btn.style.position = 'absolute';
+      btn.style.top    = pos.top    !== null ? pos.top    : '';
+      btn.style.right  = pos.right  !== null ? pos.right  : '';
+      btn.style.bottom = pos.bottom !== null ? pos.bottom : '';
+      btn.style.left   = pos.left   !== null ? pos.left   : '';
+      sadMsg.style.display = 'block';
+      sadMsg.textContent = sadMsgs[noCount - 1];
+    }
+
+    if (noCount >= 3) {
+      // Sad pony face
+      document.getElementById('eyeNormal').style.display = 'none';
+      document.getElementById('eyeSad').style.display    = 'block';
+      document.getElementById('eyeHappy').style.display  = 'none';
+      document.getElementById('smileNormal').style.display = 'none';
+      document.getElementById('smileSad').style.display    = 'block';
+      document.getElementById('smileHappy').style.display  = 'none';
+      
+      // Remove the no button
+      btn.style.display = 'none';
+      
+      sadMsg.style.display = 'block';
+      sadMsg.textContent = "aww ur breaking my heart:<";
+    }
+  }
+
+  // No button runs away from cursor
+  document.getElementById('btnNo').addEventListener('mousemove', function(e) {
+    if (noCount >= 3) return;
+    const btn = this;
+    const rect = btn.getBoundingClientRect();
+    const btnCx = rect.left + rect.width/2;
+    const btnCy = rect.top  + rect.height/2;
+    const dx = e.clientX - btnCx;
+    const dy = e.clientY - btnCy;
+    if (Math.sqrt(dx*dx + dy*dy) < 80) {
+      const card = document.querySelector('#mainScreen');
+      const cr = card.getBoundingClientRect();
+      let nx = rect.left - dx * 1.5;
+      let ny = rect.top  - dy * 1.5;
+      nx = Math.max(cr.left, Math.min(cr.right  - rect.width,  nx)) - cr.left;
+      ny = Math.max(cr.top,  Math.min(cr.bottom - rect.height, ny)) - cr.top;
+      btn.style.position = 'absolute';
+      btn.style.left = nx + 'px';
+      btn.style.top  = ny + 'px';
+      btn.style.right  = '';
+      btn.style.bottom = '';
+    }
+  });
+
+  function pressYes() {
+    document.getElementById('mainScreen').style.display = 'none';
+    const ys = document.getElementById('yesScreen');
+    ys.style.display = 'block';
+    spawnConfetti();
+  }
+
+  function spawnConfetti() {
+    const colors = ['#ff6eb4','#ffe066','#a259e8','#4ecde6','#cc1111','#7ecb5a','#ff99bb'];
+    for (let i = 0; i < 80; i++) {
+      setTimeout(() => {
+        const c = document.createElement('div');
+        c.className = 'confetti-piece';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.width  = (6 + Math.random() * 8) + 'px';
+        c.style.height = (6 + Math.random() * 8) + 'px';
+        c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        c.style.animationDuration = (2 + Math.random() * 2.5) + 's';
+        c.style.animationDelay = '0s';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 5000);
+      }, i * 30);
+    }
+  }
+</script>
+</body>
+</html>
